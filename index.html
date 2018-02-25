@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection"content="telephone=no, email=no">
+  <title>air demo</title>
+  <style>
+  .btn {
+    margin: 8px;
+  }
+  .btn button {
+    width: 100px;
+  }
+  </style>
+</head>
+<body>
+  <p>air demo</p>
+  <div class="radio">
+    <input checked="true" type="radio" name="airport" value="zh">深航</input>
+    <input type="radio" name="airport" value="mu">东航</input>
+    <input type="radio" name="airport" value="cz">南航</input>
+  </div>
+
+  <div><input id="name"></div>
+  <div><input id="card"></div>
+
+  <!--<div class="btn">
+    <button id="zhbtn">zh</button>
+  </div>-->
+  <div class="btn">
+    <button id="submitBtn">submit</button>
+  </div>
+  <script>
+  baseUri = 'http://47.94.141.206:8081/api/'
+  // var baseUri = 'http://192.168.1.103:3000/api/'
+  var airports = document.getElementsByName('airport')
+  var nameInput = document.getElementById('name')
+  var cardInput = document.getElementById('card')
+  // var zhbtn = document.getElementById('zhbtn')
+  var submitBtn = document.getElementById('submitBtn')
+
+  function post (url, data, fn) {
+    // datat应为'a=a1&b=b1'这种字符串格式，在jq里如果data为对象会自动将对象转成这种字符串格式
+    var xhr = new XMLHttpRequest()
+    xhr.open("POST", url, true)
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")  
+    // 添加http头，发送信息至服务器时内容编码类型
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+        // 304未修改
+        fn.call(this, xhr.responseText)
+      }
+    }
+    xhr.send(data)
+  }
+
+  /*zhbtn.onclick = function () {
+    var data = 'name=' + encodeURI('林兰英') + '&card=35210219791211242X'
+    post(`${baseUri}zh/flight`, data, function(res) {
+      alert(res)
+      //var user = JSON.parse(res)
+      
+      //alert(user.name)
+    })
+  }*/
+  
+  submitBtn.onclick = function () {
+    var len = airports.length
+    var i
+    var airport = ''
+    for (i = 0; i < len; i++) {
+      if (airports[i].checked) {
+        airport = airports[i].value
+      }
+    }
+    var name = nameInput.value.trim()
+    var card = cardInput.value.trim()
+    if (name && card) {
+      var data = 'name=' + encodeURI(name) + '&card=' + card
+      post(`${baseUri}${airport}/flight`, data, function(res) {
+        alert(res)	
+        // nameInput.value = ''
+        // cardInput.value = ''
+      })
+    }
+  }
+  </script>
+</body>
+</html>
